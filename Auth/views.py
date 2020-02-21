@@ -41,22 +41,20 @@ def SignupUser(request):
                 return JsonResponse('loggedIn',safe=False)
 
 
- 
-class  LoginUser(generics.CreateAPIView):
-    serializer_class=LoginSerilaizer
-    queryset=User.objects.all()
-    def create(self, request):
-        
-        u_name=request.data['username']
-        p=request.data['password']
-        user = authenticate(username=u_name, password=p)
+@csrf_exempt
+def  LoginUser(request):
+    
+        if request.method == 'POST':
+            u_name=request.POST['username']
+            p=request.POST['password']
+            user = authenticate(username=u_name, password=p)
 
-        if user is not None:
-            user=User.objects.get(username=u_name)
-            login(request,user)
-            return JsonResponse('Done',safe=False)
-        else:
-            return JsonResponse('None',safe=False)
+            if user is not None:
+                user=User.objects.get(username=u_name)
+                login(request,user)
+                return JsonResponse('Done',safe=False)
+            else:
+                return JsonResponse('None',safe=False)
 
 
                 
