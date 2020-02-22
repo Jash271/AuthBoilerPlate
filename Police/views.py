@@ -18,6 +18,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from . serializers import NewCrimeserializer
 from . models import Crime
+from django.core.mail import send_mail
 
 # Create your views here.
 class NewCrime(generics.CreateAPIView):
@@ -35,3 +36,10 @@ def records(request):
     d=json.dumps(li)
     return JsonResponse(d,safe=False)
 
+@api_view(['POST'])
+def sendmail(request):
+    Name=request.data['Name']
+    location=request.data['Location']
+    Timestamp=request.data['Timestamp']
+    send_mail('Loan','{} located at {} on this time {}'.format(Name,location,Timestamp),'hrishikesh2pv@gmail.com',['shahjash271@gmail.com'],fail_silently=False)
+    return JsonResponse("Done",safe=False)
