@@ -13,17 +13,20 @@ from django.contrib.auth.models import User
 import json
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 # Create your views here.
-@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def SignupUser(request):
-    
-        if request.method == 'POST':
-
-            u_name=request.POST['username']
-            f_name=request.POST['first_name']
-            l_name=request.POST['last_name']
-            passw=request.POST['password']
-            e_mail=request.POST['email']
+           
+        
+            u_name=request.data['username']
+            f_name=request.data['first_name']
+            l_name=request.data['last_name']
+            passw=request.data['password1']
+            e_mail=request.data['email']
             print(u_name)
             try: 
                 User.objects.get(username=u_name)
