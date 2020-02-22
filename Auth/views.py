@@ -16,6 +16,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+from Police.models import Police
 # Create your views here.
 @api_view(['POST'])
 def SignupUser(request):
@@ -56,9 +57,13 @@ def LoginUser(request):
     if user is not None:
         user=User.objects.get(username=u_name)
         login(request,user)
-        return JsonResponse("Logged In")
+        try:
+            p=Police.objects.get(ref=request.user)
+            return JsonResponse("1",safe=False)
+        except:
+            return JsonResponse("0",safe=False)
     else:
-        return JsonResponse("None")
+        return JsonResponse("None",safe=False)
 
 
 
