@@ -16,8 +16,8 @@ from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from . serializers import NewCrimeserializer
-from . models import Crime
+from . serializers import NewCrimeserializer,FIRserializer,FIRserializer1
+from . models import Crime,FIR
 from django.core.mail import send_mail
 
 # Create your views here.
@@ -43,3 +43,84 @@ def sendmail(request):
     Timestamp=request.data['Timestamp']
     send_mail('Loan','{} located at {} on this time {}'.format(Name,location,Timestamp),'hrishikesh2pv@gmail.com',['shahjash271@gmail.com'],fail_silently=False)
     return JsonResponse("Done",safe=False)
+
+@api_view(['POST'])#Create FIR API - user
+def CreateFIR(request):
+    Name=request.data['Victim_Name']
+    Complaint_1=request.data['Complaint']
+    Aadhar=request.data['Aaadhar_No']
+    Contact=request.data['Contact_No']
+    email_1=request.data['email']
+    chowki_1=request.data['chowki']
+    f=FIR(Victim_Name=Name,Complaint=Complaint_1,Aaadhar_No=Aadhar,Contact_No=Contact,email=email_1,Chowki=chowki_1)
+    f.save()
+    send_mail('Verify that you have created FIR','http://127.0.0.1:8000/police/verifyFIR/{}'.format(f.id),'hrishikesh2pv@gmail.com',['shahjash271@gmail.com'],fail_silently=False)
+    return JsonResponse("Done",safe=False)
+
+
+def  verifyFIR(request,obj_id):#Verify FIR - user
+    f=FIR.objects.get(id=obj_id)
+    f.User_Verified=True
+
+    f.save()
+    send_mail('Your have verified your FIR,check your loan here','http://127.0.0.1:8000/police/DetailFIR/{}'.format(obj_id),'hrishikesh2pv@gmail.com',['shahjash271@gmail.com'],fail_silently=False)
+    return HttpResponse("Done")
+
+
+@api_view(['GET'])# verify FIR - Police
+def PoliceVerifyFIR(request,obj_id):
+    f=FIR.objects.get(id=obj_id)
+    f.Police_Verified=True
+    f.save()
+    send_mail('POLICE HAS VERIFIED YOUR FIR','http://127.0.0.1:8000/police/DetailFIR/{}'.format(obj_id),'hrishikesh2pv@gmail.com',['shahjash271@gmail.com'],fail_silently=False)
+    return JsonResponse("Verified",safe=False)
+
+
+
+
+
+class ViewFIR(generics.ListAPIView):#View FIR LIST
+    serializer_class=FIRserializer
+    queryset=FIR.objects.filter(User_Verified=True)
+
+class DetailFIR(generics.RetrieveAPIView):#View Particular FIR
+    serializer_class=FIRserializer1
+    queryset=FIR.objects.all()
+
+
+
+class VerifiedFromChowki(generics.GenericAPIView):
+    #View FIR verified from particular Chowki
+    def post(self,request):
+        place=request.data['Chowki']
+        f=FIR.objects.filter(Police_Verified=True,Chowki=place)
+        dict={}
+        dict2={}
+        li=[]
+        for x in f:
+            dict:{
+                'Name':f.Victim_Name,
+                'Complaint':f.Complaint,
+                'Aadhar_No':f.Aaadhar_No,
+                'email':f.email,
+                'Chowki':f.chowki,
+                'Police_Verified':f.Police_Verified
+            }
+            li.append(dict)
+
+        dict2={
+            'Details':li
+        }
+        json.dumps(dict2)
+        return JsonResponse(dict2)
+
+
+
+
+                
+                
+                
+                
+
+            
+    

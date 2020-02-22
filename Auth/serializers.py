@@ -3,6 +3,7 @@ from rest_framework.serializers import HyperlinkedModelSerializer
 from rest_framework import  serializers
 from django.contrib.auth.models import User
 
+
 class Signupserializer(serializers.Serializer):
     password1=serializers.CharField(max_length=100)
     class Meta:
