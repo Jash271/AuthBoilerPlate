@@ -18,46 +18,48 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 # Create your views here.
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def SignupUser(request):
-           
-        
-            u_name=request.data['username']
-            f_name=request.data['first_name']
-            l_name=request.data['last_name']
-            passw=request.data['password1']
-            e_mail=request.data['email']
-            print(u_name)
-            try: 
-                User.objects.get(username=u_name)
-
-                return JsonResponse('Username Already exists',safe=False)
-            except:
-            
-            
-                u=User(username=u_name,first_name=f_name,last_name=l_name,email=e_mail)
-                u.set_password(passw)
-                u.save()
-                n_user=User.objects.get(username=u_name)
-                login(request,n_user)
-                print(request.user)
-                return JsonResponse('loggedIn',safe=False)
-
-
-@csrf_exempt
-def  LoginUser(request):
+    serializer_class=Signupserializer
+    queryset=User.objects.all()
+   
     
-        if request.method == 'POST':
-            u_name=request.POST['username']
-            p=request.POST['password']
-            user = authenticate(username=u_name, password=p)
+        
+    u_name=request.data['username']
+    f_name=request.data['first_name']
+    l_name=request.data['last_name']
+    passw=request.data['password']
+    e_mail=request.data['email']
+    print(u_name)
+    try: 
+        User.objects.get(username=u_name)
 
-            if user is not None:
-                user=User.objects.get(username=u_name)
-                login(request,user)
-                return JsonResponse('Done',safe=False)
-            else:
-                return JsonResponse('None',safe=False)
+        return JsonResponse('Username Already exists',safe=False)
+    except:
+            
+            
+        u=User(username=u_name,first_name=f_name,last_name=l_name,email=e_mail)
+        u.set_password(passw)
+        u.save()
+        n_user=User.objects.get(username=u_name)
+        
+        return JsonResponse('loggedIn',safe=False)
+
+
+@api_view(['POST'])
+def LoginUser(request):
+    serializer_class=Signupserializer
+    queryset=User.objects.all()
+
+    u_name=request.data['username']
+    passw=request.data['password']
+    user=authenticate(username=u_name,password=passw)
+    if user is not None:
+        user=User.objects.get(username=u_name)
+        login(request,user)
+        return JsonResponse("Logged In")
+    else:
+        return JsonResponse("None")
+
 
 
                 
