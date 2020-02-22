@@ -27,8 +27,8 @@ class NewCrime(generics.CreateAPIView):
 
 @api_view(['POST'])
 def records(request):
-    ide=request.data['Criminal_ID']
-    data=Crime.objects.filter(Criminal_ID=ide)
+    crim_name=request.data['Criminal_ID']
+    data=Crime.objects.filter(Name=crim_name)
     li=[]
     for x in data:
         li.append(x.Description)
