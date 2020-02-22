@@ -19,6 +19,7 @@ from rest_framework.permissions import AllowAny
 from . serializers import NewCrimeserializer,FIRserializer,FIRserializer1
 from . models import Crime,FIR
 from django.core.mail import send_mail
+import pdb
 
 # Create your views here.
 class NewCrime(generics.CreateAPIView):
@@ -94,19 +95,24 @@ class VerifiedFromChowki(generics.GenericAPIView):
     def post(self,request):
         place=request.data['Chowki']
         f=FIR.objects.filter(Police_Verified=True,Chowki=place)
+        print(f)
         dict={}
         dict2={}
         li=[]
         for x in f:
-            dict:{
-                'Name':f.Victim_Name,
-                'Complaint':f.Complaint,
-                'Aadhar_No':f.Aaadhar_No,
-                'email':f.email,
-                'Chowki':f.chowki,
-                'Police_Verified':f.Police_Verified
+            y=x.Victim_Name
+            print(x)
+            d={
+                'Name':x.Victim_Name,
+                
+                'Complaint':x.Complaint,
+                
+                'Aadhar_No':x.Aaadhar_No,
+                'email':x.email,
+                'Chowki':x.Chowki,
+                'Police_Verified':x.Police_Verified
             }
-            li.append(dict)
+            li.append(d)
 
         dict2={
             'Details':li
